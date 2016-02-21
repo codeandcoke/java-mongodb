@@ -6,11 +6,9 @@ import org.sfaci.holamongodb.base.Libro;
 import org.sfaci.holamongodb.util.Util;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,7 +17,8 @@ import java.util.List;
  * @author Santiago Faci
  * @version curso 2015-2016
  */
-public class VentanaController implements ActionListener, MouseListener {
+public class VentanaController implements ActionListener, MouseListener, KeyListener,
+    FocusListener {
 
     private Ventana view;
     private VentanaModel model;
@@ -51,6 +50,8 @@ public class VentanaController implements ActionListener, MouseListener {
         view.btEliminar.addActionListener(this);
         view.btGuardar.addActionListener(this);
         view.btModificar.addActionListener(this);
+        view.tfBuscar.addFocusListener(this);
+        view.tfBuscar.addKeyListener(this);
 
         view.lLibros.addMouseListener(this);
 
@@ -188,6 +189,50 @@ public class VentanaController implements ActionListener, MouseListener {
 
     @Override
     public void mouseExited(MouseEvent e) {
+
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+
+        if (e.getSource() == view.tfBuscar) {
+            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+
+                if (view.tfBuscar.getText().equals("")) {
+                    listar();
+                    return;
+                }
+
+                List<Libro> listaLibros = new ArrayList<>();
+                try {
+                    listaLibros = model.buscarLibro(view.tfBuscar.getText());
+                } catch (ParseException pe) {
+                    Util.mensajeError("Algún dato no se puede cargar", "Error al cargar");
+                }
+                dlmLibros.removeAllElements();
+                for (Libro libro : listaLibros)
+                    dlmLibros.addElement(libro);
+            }
+        }
+    }
+
+    @Override
+    public void focusGained(FocusEvent e) {
+        view.tfBuscar.selectAll();
+    }
+
+    @Override
+    public void focusLost(FocusEvent e) {
 
     }
 }

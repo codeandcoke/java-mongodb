@@ -4,18 +4,17 @@ import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 import com.mongodb.util.JSON;
 import org.bson.Document;
 import org.sfaci.holamongodb.base.Libro;
+import org.sfaci.holamongodb.util.Constantes;
 import org.sfaci.holamongodb.util.Util;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * Modelo para la ventana
@@ -33,7 +32,7 @@ public class VentanaModel {
      */
     public void conectar() {
         mongoClient = new MongoClient();
-        db = mongoClient.getDatabase(Libro.COLECCION);
+        db = mongoClient.getDatabase(Constantes.NOMBRE_BASEDEDATOS);
     }
 
     /**
@@ -80,6 +79,32 @@ public class VentanaModel {
      */
     public void eliminarLibro(String titulo) {
         db.getCollection(Libro.COLECCION).deleteOne(new Document("titulo", titulo));
+    }
+
+    /**
+     * Busca un libro buscando en varios de sus atributos
+     * También ordena los resultados
+     * @param busqueda
+     */
+    public List<Libro> buscarLibro(String busqueda) throws ParseException {
+
+        Document documento = new Document("$or", Arrays.asList(
+                new Document("tiulo", busqueda),
+                new Document("descripcion", busqueda),
+                new Document("autor", busqueda)));
+
+        FindIterable findIterable = db.getCollection(Libro.COLECCION)
+                .find(documento)
+                .sort(new Document("titulo", 1));
+        return getListaLibros(findIterable);
+
+        // También es posible realizar la búsqueda de esta manera
+        /*FindIterable findIterable = db.getCollection(Libro.COLECCION).find(Filters.or(
+                Filters.eq("titulo", busqueda),
+                Filters.eq("descripcion", busqueda),
+                Filters.eq("autor", busqueda)))
+                .sort(new Document("titulo", 1));
+        return getListaLibros(findIterable);*/
     }
 
     /**

@@ -22,6 +22,7 @@ public class Ventana {
     public JButton btModificar;
     public JButton btEliminar;
     public JList lLibros;
+    public JTextField tfBuscar;
 
     public Ventana() {
 
