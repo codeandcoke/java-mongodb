@@ -1,5 +1,6 @@
 package org.sfaci.holamongodb;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
@@ -7,6 +8,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.util.JSON;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.sfaci.holamongodb.base.Libro;
 import org.sfaci.holamongodb.util.Constantes;
 import org.sfaci.holamongodb.util.Util;
@@ -88,10 +90,15 @@ public class VentanaModel {
      */
     public List<Libro> buscarLibro(String busqueda) throws ParseException {
 
-        Document documento = new Document("$or", Arrays.asList(
-                new Document("tiulo", busqueda),
+        // Búsqueda utilizando el operador OR
+        /*Document documento = new Document("$or", Arrays.asList(
+                new Document("titulo", busqueda),
                 new Document("descripcion", busqueda),
-                new Document("autor", busqueda)));
+                new Document("autor", busqueda)));*/
+
+        // Búsqueda utilizando expresiones regulares
+        BasicDBObject documento = new BasicDBObject();
+        documento.put("titulo", new BasicDBObject("$regex", "/*" + busqueda + "/*"));
 
         FindIterable findIterable = db.getCollection(Libro.COLECCION)
                 .find(documento)
